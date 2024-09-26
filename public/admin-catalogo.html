@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Catálogo de Vehículos</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <h1>Administrar Catálogo de Vehículos</h1>
+
+    <!-- Formulario para agregar/editar vehículos -->
+    <form id="catalogoForm" enctype="multipart/form-data">
+        <input type="hidden" id="vehiculo-id" name="vehiculo-id">
+
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required><br><br>
+    
+        <label for="precio">Precio:</label>
+        <input type="number" id="precio" name="precio" required><br><br>
+    
+        <label for="color">Color:</label>
+        <input type="text" id="color" name="color" required><br><br>
+    
+        <label for="imagen">Imagen:</label>
+        <input type="file" id="imagen" name="imagen"><br><br>
+        <img id="imagen-preview" src="" alt="Imagen actual" style="display:none; max-width: 200px;"/><br>
+
+    
+        <button type="submit">Guardar Vehículo</button>
+    </form>
+ 
+    <!-- Tabla con los vehículos en el catálogo -->
+    <table id="catalogo-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Precio</th>
+                <th>Color</th>
+                <th>Imagen</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Se llenará dinámicamente con JavaScript -->
+        </tbody>
+    </table>
+
+    <button class="salir-btn">Salir</button>
+
+    <!-- Script de JavaScript -->
+    <script src="js/admin-catalogo.js"></script>
+</body>
+</html>

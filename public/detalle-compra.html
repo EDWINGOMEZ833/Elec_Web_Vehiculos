@@ -12,8 +12,6 @@
     <h1>Carstop</h1>    
 </header>
 <button  class="salir-btn" onclick="location.href='login.html'">Salir</button>
-
-
     
     <section class="detalle-compra-container">
         <h2 class="hh2">Detalle de Compra</h2>
@@ -38,40 +36,6 @@
         <p>© 2024 Carstop. Todos los derechos reservados. | Política de privacidad | Términos y condiciones</p>
     </footer>
 
-    <script>
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                id: params.get('id'),
-                nombre: params.get('nombre'),
-                precio: params.get('precio')
-            };
-        }
-
-        function loadDetails() {
-            const { id, nombre, precio } = getQueryParams();
-            console.log(`ID: ${id}, Nombre: ${nombre}, Precio: ${precio}`);
-
-            const imageMap = {
-                1: 'img/deportivo.jpg',
-                2: 'img/SUV.jpg',
-                3: 'img/Volkswagen_Golf.jpg',
-                4: 'img/turdratoyota.jpg',
-                5: 'img/mustangshelby.jpg',
-                6: 'img/mazdacx50.jpg',
-                
-            };
-
-            document.getElementById('nombre-vehiculo').textContent = nombre;
-            document.getElementById('precio-vehiculo').textContent = `$${precio}`;
-            document.getElementById('imagen-vehiculo').src = imageMap[id];
-        }
-
-        function confirmarCompra() {
-            window.location.href = 'compra.html';
-        }
-
-        window.onload = loadDetails;
-    </script>
+    <script src="js/detalle-compra.js"></script>
 </body>
 </html>
