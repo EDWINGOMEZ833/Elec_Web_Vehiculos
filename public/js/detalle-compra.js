@@ -1,29 +1,42 @@
+async function getVehicleDetails(id) {
+    try {
+        const response = await fetch(`/catalogo/${id}`);
+        if (!response.ok) {
+            throw new Error('Error al obtener los detalles del vehículo.');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        alert('No se pudieron cargar los detalles del vehículo.');
+    }
+}
+
 function getQueryParams() {
     const params = new URLSearchParams(window.location.search);
     return {
         id: params.get('id'),
-        nombre: params.get('nombre'),
+        nombre: params.get('titulo'),
         precio: params.get('precio')
     };
 }
 
-function loadDetails() {
-    const { id, nombre, precio } = getQueryParams();
-    console.log(`ID: ${id}, Nombre: ${nombre}, Precio: ${precio}`);
+async function loadDetails() {
+    const { id } = getQueryParams();
 
-    const imageMap = {
-        1: 'img/deportivo.jpg',
-        2: 'img/SUV.jpg',
-        3: 'img/Volkswagen_Golf.jpg',
-        4: 'img/turdratoyota.jpg',
-        5: 'img/mustangshelby.jpg',
-        6: 'img/mazdacx50.jpg',
-        
-    };
+    if (!id) {
+        alert('ID del vehículo no proporcionado.');
+        return;
+    }
 
-    document.getElementById('nombre-vehiculo').textContent = nombre;
-    document.getElementById('precio-vehiculo').textContent = `$${precio}`;
-    document.getElementById('imagen-vehiculo').src = imageMap[id];
+    const vehicleDetails = await getVehicleDetails(id);
+
+    if (vehicleDetails) {
+        document.getElementById('id-vehiculo').textContent = vehicleDetails.id;
+        document.getElementById('nombre-vehiculo').textContent = vehicleDetails.titulo;
+        document.getElementById('precio-vehiculo').textContent = `$${vehicleDetails.precio}`;
+        document.getElementById('imagen-vehiculo').src = vehicleDetails.imagen;
+        document.getElementById('color-vehiculo').textContent = `Color: ${vehicleDetails.color}`;
+    }
 }
 
 function confirmarCompra() {

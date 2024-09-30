@@ -28,7 +28,12 @@ document.querySelector('.salir-btn').addEventListener('click', cerrarSesion);
 // Función para obtener todos los vehículos desde el servidor y almacenarlos
 function obtenerCatalogo() {
     fetch('/admin-catalogo')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al cargar el catálogo');
+            }
+            return response.json();
+        })
         .then(data => {
             todosLosVehiculos = data; // Almacenar todos los vehículos
             cargarCatalogo(todosLosVehiculos); // Cargar todos los vehículos inicialmente
@@ -67,7 +72,7 @@ document.getElementById('catalogoForm').addEventListener('submit', async (event)
 
     try {
         const response = await fetch(vehiculoId ? `/admin-catalogo/${vehiculoId}` : '/admin-catalogo', {
-            method: vehiculoId ? 'PUT' : 'POST', // Determina si es PUT o POST
+            method: vehiculoId ? 'PUT' : 'POST', // Si hay ID, actualizar, si no, crear nuevo
             body: formData
         });
 
@@ -75,10 +80,7 @@ document.getElementById('catalogoForm').addEventListener('submit', async (event)
             alert('Vehículo guardado exitosamente.');
             document.getElementById('catalogoForm').reset(); // Limpiar el formulario
             limpiarImagenPreview(); // Ocultar la imagen al guardar
-
-            // Ocultar el botón de cancelar después de guardar
             document.getElementById('cancelar-btn').style.display = 'none';
-
             obtenerCatalogo(); // Recargar el catálogo actualizado
         } else {
             alert('Error al guardar el vehículo.');
@@ -100,13 +102,28 @@ function eliminarVehiculo(id) {
 // Función para editar un vehículo
 function editarVehiculo(id) {
     fetch(`/admin-catalogo/${id}`)
-        .then(response => response.json())
-        .then(vehiculo => cargarVehiculo(vehiculo))
-        .catch(error => console.error('Error al obtener datos del vehículo:', error));
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else if (response.status === 404) {
+                alert('Vehículo no encontrado.');
+                throw new Error('Vehículo no encontrado');
+            } else {
+                throw new Error('Error al obtener los datos del vehículo');
+            }
+        })
+        .then(vehiculo => {
+            cargarVehiculo(vehiculo);
+        })
+        .catch(error => {
+            console.error('Error al obtener datos del vehículo:', error);
+        });
 }
+
 
 // Función para cargar un vehículo en el formulario
 function cargarVehiculo(vehiculo) {
+    // Asignar los valores del vehículo al formulario
     document.getElementById('vehiculo-id').value = vehiculo.id;
     document.getElementById('titulo').value = vehiculo.titulo;
     document.getElementById('precio').value = vehiculo.precio;
@@ -114,11 +131,14 @@ function cargarVehiculo(vehiculo) {
 
     // Mostrar la imagen actual
     const imagenPreview = document.getElementById('imagen-preview');
-    imagenPreview.src = vehiculo.imagen; // Mostrar imagen del servidor
-    imagenPreview.style.display = 'block';
+    imagenPreview.src = vehiculo.imagen; // La URL de la imagen desde el servidor
+    imagenPreview.style.display = 'block'; // Mostrar la vista previa de la imagen
 
     // Mostrar el botón de cancelar
     document.getElementById('cancelar-btn').style.display = 'inline';
+
+    // Cambiar el texto del botón de guardar a "Actualizar Vehículo"
+    document.querySelector('button[type="submit"]').textContent = 'Actualizar Vehículo';
 }
 
 // Función para cancelar la edición

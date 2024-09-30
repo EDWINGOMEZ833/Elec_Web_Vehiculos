@@ -8,9 +8,10 @@ document.getElementById('registro-form').addEventListener('submit', function(eve
     const correo = document.getElementById('correo').value.trim();
     const nombre_usuario = document.getElementById('usuario').value.trim();
     const contrasena = document.getElementById('contrasena').value.trim();
+    const tipo_usuario	 = document.getElementById('tipo_usuario').value.trim();
 
     // Validar que los campos no estén vacíos
-    if (!nombre || !tipo_documento || !numero_documento || !correo || !nombre_usuario || !contrasena) {
+    if (!nombre || !tipo_documento || !numero_documento || !correo || !nombre_usuario || !contrasena || !tipo_usuario) {
         alert('Todos los campos son obligatorios.');
         return;
     }
@@ -27,7 +28,8 @@ document.getElementById('registro-form').addEventListener('submit', function(eve
             numero_documento: numero_documento,
             correo: correo,
             nombre_usuario: nombre_usuario,
-            contrasena: contrasena
+            contrasena: contrasena,
+            tipo_usuario: tipo_usuario
         })
     })
     .then(response => {

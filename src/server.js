@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const db = require('./db');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
-const fs = require('fs');  // Importar fs para eliminar imágenes
+const fs = require('fs');  // Importamos fs para eliminar imágenes
 const app = express();
 const port = 3000;
 
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Configurar middleware
+// Configuración de middlewares
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public'))); // Sirviendo archivos estáticos
@@ -76,9 +76,28 @@ app.post('/login', (req, res) => {
             tipo_usuario: usuario.tipo_usuario,
             usuario: {
                 nombre_usuario: usuario.nombre_usuario,
-                // Agrega otros campos que quieras incluir
             }
         });
+    });
+});
+
+// Endpoint para obtener el catálogo (accesible para todos los usuarios)
+app.get('/catalogo', (req, res) => {
+    const query = 'SELECT * FROM catalogo';
+    db.query(query, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(200).json(result);
+    });
+});
+
+// Endpoint para obtener un vehículo por su ID
+app.get('/catalogo/:id', (req, res) => {
+    const { id } = req.params;
+    const query = 'SELECT * FROM catalogo WHERE id = ?';
+    db.query(query, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.length === 0) return res.status(404).json({ error: 'Vehículo no encontrado' });
+        res.status(200).json(result[0]);
     });
 });
 
@@ -91,18 +110,23 @@ app.get('/admin-catalogo', (req, res) => {
     });
 });
 
-// Endpoint para obtener un vehículo por su ID
+// Endpoint para obtener un vehículo específico por su ID (solo para administradores)
 app.get('/admin-catalogo/:id', (req, res) => {
     const { id } = req.params;
-    const query = 'SELECT * FROM catalogo WHERE id = ?';
-    db.query(query, [id], (err, result) => {
+    const querySelect = 'SELECT * FROM catalogo WHERE id = ?';
+    
+    db.query(querySelect, [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
-        if (result.length === 0) return res.status(404).json({ error: 'Vehículo no encontrado' });
-        res.status(200).json(result[0]);
+        
+        if (result.length === 0) {
+            return res.status(404).json({ message: 'Vehículo no encontrado' });
+        }
+
+        res.status(200).json(result[0]); // Devolver el primer resultado (vehículo encontrado)
     });
 });
 
-// Endpoint para agregar un nuevo vehículo al catálogo
+// Endpoint para agregar un nuevo vehículo al catálogo (solo para administradores)
 app.post('/admin-catalogo', upload.single('imagen'), (req, res) => {
     const { titulo, precio, color } = req.body;
     const imagen = req.file ? `/uploads/${req.file.filename}` : null;
@@ -118,7 +142,7 @@ app.post('/admin-catalogo', upload.single('imagen'), (req, res) => {
     });
 });
 
-// Endpoint para actualizar un vehículo existente en el catálogo
+// Endpoint para actualizar un vehículo existente en el catálogo (solo para administradores)
 app.put('/admin-catalogo/:id', upload.single('imagen'), (req, res) => {
     const { id } = req.params;
     const { titulo, precio, color } = req.body;
@@ -156,7 +180,7 @@ app.put('/admin-catalogo/:id', upload.single('imagen'), (req, res) => {
     });
 });
 
-// Endpoint para eliminar un vehículo del catálogo
+// Endpoint para eliminar un vehículo del catálogo (solo para administradores)
 app.delete('/admin-catalogo/:id', (req, res) => {
     const { id } = req.params;
     const query = 'DELETE FROM catalogo WHERE id = ?';
