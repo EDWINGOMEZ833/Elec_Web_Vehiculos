@@ -9,6 +9,13 @@
 <body>
     <h1>Administrar Catálogo de Vehículos</h1>
 
+    <!-- Menú de búsqueda -->
+    <label for="buscar-id">Buscar por ID:</label>
+    <input type="number" id="buscar-id" placeholder="Ingresa ID de vehículo">
+    <button id="buscar-btn">Buscar</button>
+    <button id="restablecer-btn">Restablecer</button>
+
+
     <!-- Formulario para agregar/editar vehículos -->
     <form id="catalogoForm" enctype="multipart/form-data">
         <input type="hidden" id="vehiculo-id" name="vehiculo-id">
@@ -26,8 +33,8 @@
         <input type="file" id="imagen" name="imagen"><br><br>
         <img id="imagen-preview" src="" alt="Imagen actual" style="display:none; max-width: 200px;"/><br>
 
-    
         <button type="submit">Guardar Vehículo</button>
+        <button type="button" id="cancelar-btn" style="display:none;">Cancelar</button>
     </form>
  
     <!-- Tabla con los vehículos en el catálogo -->

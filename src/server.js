@@ -4,26 +4,28 @@ const bodyParser = require('body-parser');
 const db = require('./db');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
+const fs = require('fs');  // Importar fs para eliminar imágenes
 const app = express();
 const port = 3000;
 
-// Configurar multer para subir imágenes
+// Configurar almacenamiento para las imágenes subidas
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Carpeta donde se guardarán las imágenes
+        cb(null, 'public/uploads');
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Generar un nombre único para la imagen
+        cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
-const upload = multer({ storage });
+
+const upload = multer({ storage: storage });
 
 // Configurar middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public'))); // Sirviendo archivos estáticos
 app.use('/css', express.static(path.join(__dirname, '..', 'css')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Sirviendo las imágenes subidas
+app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'))); // Sirviendo las imágenes subidas
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Página de registro
@@ -80,7 +82,6 @@ app.post('/login', (req, res) => {
     });
 });
 
-
 // Endpoint para obtener el catálogo (solo para administradores)
 app.get('/admin-catalogo', (req, res) => {
     const query = 'SELECT * FROM catalogo';
@@ -104,7 +105,7 @@ app.get('/admin-catalogo/:id', (req, res) => {
 // Endpoint para agregar un nuevo vehículo al catálogo
 app.post('/admin-catalogo', upload.single('imagen'), (req, res) => {
     const { titulo, precio, color } = req.body;
-    const imagen = req.file ? `/public/uploads/${req.file.filename}` : null;
+    const imagen = req.file ? `/uploads/${req.file.filename}` : null;
 
     if (!titulo || !precio || !color || !imagen) {
         return res.status(400).json({ error: 'Todos los campos son requeridos' });
@@ -121,7 +122,7 @@ app.post('/admin-catalogo', upload.single('imagen'), (req, res) => {
 app.put('/admin-catalogo/:id', upload.single('imagen'), (req, res) => {
     const { id } = req.params;
     const { titulo, precio, color } = req.body;
-
+    
     // Consulta para obtener el vehículo existente
     const querySelect = 'SELECT imagen FROM catalogo WHERE id = ?';
     
@@ -132,9 +133,17 @@ app.put('/admin-catalogo/:id', upload.single('imagen'), (req, res) => {
             return res.status(404).json({ message: 'Vehículo no encontrado' });
         }
 
-        // Obtener la imagen actual
+        // Obtener la imagen actual de la base de datos
         const imagenActual = result[0].imagen;
         const nuevaImagen = req.file ? `/uploads/${req.file.filename}` : imagenActual;
+
+        // Si hay una nueva imagen y existe una imagen previa, eliminar la imagen anterior
+        if (req.file && imagenActual) {
+            const imagenPath = path.join(__dirname, 'public', imagenActual);
+            fs.unlink(imagenPath, (err) => {
+                if (err) console.error(`Error al eliminar la imagen anterior: ${err.message}`);
+            });
+        }
 
         // Consulta para actualizar el vehículo
         let queryUpdate = 'UPDATE catalogo SET titulo = ?, precio = ?, color = ?, imagen = ? WHERE id = ?';
@@ -146,7 +155,6 @@ app.put('/admin-catalogo/:id', upload.single('imagen'), (req, res) => {
         });
     });
 });
-
 
 // Endpoint para eliminar un vehículo del catálogo
 app.delete('/admin-catalogo/:id', (req, res) => {
@@ -160,5 +168,5 @@ app.delete('/admin-catalogo/:id', (req, res) => {
 
 // Iniciar el servidor
 app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
+    console.log(`Servidor corriendo en http://localhost:${port}/login.html`);
 });
