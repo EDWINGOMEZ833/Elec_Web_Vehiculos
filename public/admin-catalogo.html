@@ -7,36 +7,53 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Administrar Catálogo de Vehículos</h1>
-
+    <div class="titulo-container">
+        <h1>Administrar Catálogo de Vehículos</h1>
+    </div>
     <!-- Menú de búsqueda -->
-    <label for="buscar-id">Buscar por ID:</label>
-    <input type="number" id="buscar-id" placeholder="Ingresa ID de vehículo">
-    <button id="buscar-btn">Buscar</button>
-    <button id="restablecer-btn">Restablecer</button>
+    <div class="busqueda-container">
+        <label for="buscar-id">Buscar por ID:</label>
+        <input type="number" id="buscar-id" placeholder="Ingresa ID de vehículo">
+        <button class="buscar-btn" id="buscar-btn">Buscar</button>
+        <button class="restablecer-btn" id="restablecer-btn">Restablecer</button>
+    </div>
 
+    <!-- Contenedor del formulario -->
+    <div class="formulario-container">
+        <h2>Agregar / Editar Vehículo</h2>
+        <form id="catalogoForm" enctype="multipart/form-data">
+            <input type="hidden" id="vehiculo-id" name="vehiculo-id">
 
-    <!-- Formulario para agregar/editar vehículos -->
-    <form id="catalogoForm" enctype="multipart/form-data">
-        <input type="hidden" id="vehiculo-id" name="vehiculo-id">
+            <div class="form-group">
+                <label for="titulo">Título:</label>
+                <input type="text" id="titulo" name="titulo" required>
+            </div>
 
-        <label for="titulo">Título:</label>
-        <input type="text" id="titulo" name="titulo" required><br><br>
-    
-        <label for="precio">Precio:</label>
-        <input type="number" id="precio" name="precio" required><br><br>
-    
-        <label for="color">Color:</label>
-        <input type="text" id="color" name="color" required><br><br>
-    
-        <label for="imagen">Imagen:</label>
-        <input type="file" id="imagen" name="imagen"><br><br>
-        <img id="imagen-preview" src="" alt="Imagen actual" style="display:none; max-width: 200px;"/><br>
+            <div class="form-group">
+                <label for="precio">Precio:</label>
+                <input type="number" id="precio" name="precio" required>
+            </div>
 
-        <button type="submit">Guardar Vehículo</button>
-        <button type="button" id="cancelar-btn" style="display:none;">Cancelar</button>
-    </form>
- 
+            <div class="form-group">
+                <label for="color">Color:</label>
+                <input type="text" id="color" name="color" required>
+            </div>
+
+            <div class="form-group">
+                <label for="imagen">Imagen:</label>
+                <button type="button" class="elegir-imagen-btn" onclick="document.getElementById('imagen').click();">Elegir Imagen</button>
+                <input type="file" id="imagen" name="imagen" style="display:none;" onchange="updatePreview(this);">
+                <img id="imagen-preview" src="" alt="Imagen actual" style="display:none; max-width: 200px; margin-top: 10px;">
+            </div>
+            
+
+            <div class="form-buttons">
+                <button type="submit" class="guardar-btn">Guardar Vehículo</button>
+                <button type="button" id="cancelar-btn" class="cancelar-btn" style="display:none;">Cancelar</button>
+            </div>
+        </form>
+    </div>
+
     <!-- Tabla con los vehículos en el catálogo -->
     <table id="catalogo-table">
         <thead>

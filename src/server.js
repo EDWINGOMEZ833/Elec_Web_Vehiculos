@@ -128,6 +128,9 @@ app.get('/admin-catalogo/:id', (req, res) => {
 
 // Endpoint para agregar un nuevo vehículo al catálogo (solo para administradores)
 app.post('/admin-catalogo', upload.single('imagen'), (req, res) => {
+    console.log(req.body); // Verificar los campos
+    console.log(req.file);  // Verificar la imagen cargada
+
     const { titulo, precio, color } = req.body;
     const imagen = req.file ? `/uploads/${req.file.filename}` : null;
 
@@ -137,7 +140,10 @@ app.post('/admin-catalogo', upload.single('imagen'), (req, res) => {
 
     const query = 'INSERT INTO catalogo (titulo, precio, color, imagen) VALUES (?, ?, ?, ?)';
     db.query(query, [titulo, precio, color, imagen], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) {
+            console.error(err); // Log the error
+            return res.status(500).json({ error: err.message });
+        }
         res.status(201).json({ message: 'Vehículo agregado exitosamente' });
     });
 });
